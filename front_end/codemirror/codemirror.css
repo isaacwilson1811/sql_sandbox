@@ -4,7 +4,7 @@
     /* Set height, width, borders, and global font properties here */
     font-family: Consolas,Menlo,monospace ;
     font-size:20px;
-    height: 300px;
+    height: 280px;
     color: black;
   }
   
@@ -43,7 +43,7 @@
   /* CURSOR */
   
   .CodeMirror-cursor {
-    border-left: 1px solid black;
+    border-left: 2px solid black;
     border-right: none;
     width: 0;
   }

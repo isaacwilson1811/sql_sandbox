@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SQL - MTECH</title>
+    <title>SQL Sandbox</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./codemirror/codemirror.css">
     <script src="./codemirror/codemirror.min.js"></script>
     <script src="./codemirror/codemirror.min_sql.js"></script>
@@ -17,15 +18,16 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            background-color: #d1d1d1;
         }
 
         /* Top section */
         .top-section {
             display: flex;
-            justify-content: center;
+            justify-content:space-between;
             align-items: flex-start;
             padding: 20px;
-            background-color: #f2f2f2;
+            background-color: #d1d1d1;
         }
 
         .container {
@@ -88,9 +90,21 @@
         }
 
         .second-column {
-            width: 20%;
+            /* width: 20%; */
+            width: 250px;
             padding: 10px;
-            background-color: #ffffff;
+            background-color: #e0e0e0;
+        }
+
+        .second-column h3 {
+            text-align: center;
+        }
+
+        .second-column button {
+            position: relative;
+            left: 25%;
+            margin-top: 25px;
+            margin-bottom: 25px;
         }
 
         /* Bottom section 1 column */
@@ -104,7 +118,7 @@
         .single-column {
             width: 100%;
             padding: 10px;
-            background-color: #ffffff;
+            background-color: #eee;
         }
 
         /* Content styling */
@@ -132,7 +146,7 @@
         /* Query box styles */
         .query-box {
             width: 100%;
-            height: 200px;
+            height: 280px;
             resize: none;
             box-sizing: border-box;
             padding: 10px;
@@ -182,11 +196,45 @@
 
 
         /* List styles for TableName links */
+
+        .side-container {
+            display:flex;
+            justify-content: space-between;
+            /* padding: 10px; */
+        }
+
+        .side-container span {
+            font-weight: bold;
+        }
+
+        .table-name-list {
+            text-align: left;
+        }
+
         .table-name-list a {
             display: block;
             color: black;
+            background-color: #d1d1d1;
             text-decoration: underline;
-            margin: 5px 0;
+            margin: 5px 4px;
+        }
+
+        .table-name-list a:hover {
+            display: block;
+            color: white;
+            background-color: #444;
+            text-decoration: underline;
+            margin: 5px 4px;
+        }
+
+        .records-list {
+            text-align: left;
+        }
+
+        .records-list p {
+            margin: 5px 4px;
+            color: black;
+            /* background-color: #d1d1d1; */
         }
 
         /* Generic Table Styling */
@@ -224,7 +272,9 @@
 <!-- Top Section (Server IP form) -->
 <div class="top-section">
     <div class="container">
-        <p>Server IP:</p>
+        <h1 style="color: #666;">Structured Query Language</h1>
+        
+        <!-- <p>Mode: shared DataBase</p>
         <div class="input-container">
             <input type="number" class="input-box" id="input1" maxlength="3" placeholder="000" oninput="limitInput(this, 3)">
             <span>.</span>
@@ -233,8 +283,12 @@
             <input type="number" class="input-box" id="input3" maxlength="2" placeholder="000" oninput="limitInput(this, 3)">
             <span>.</span>
             <input type="number" class="input-box" id="input4" maxlength="3" placeholder="000" oninput="limitInput(this, 3)">
-        </div>
-        <button class="connect-button" onclick="saveServerIP()">Connect</button>
+        </div> -->
+        
+    </div>
+    <div style="display:flex; align-items: center; justify-content:flex-start">
+        <p>Visit W3Schools: </p>
+        <button onclick="window.open('https://www.w3schools.com/sql/', '_blank');">SQL Tutorial</button>
     </div>
 </div>
 
@@ -242,35 +296,31 @@
 <div class="two-column-section">
     <!-- Left Column: Query Section -->
     <div class="first-column">
-        <h2>Query</h2>
+        <h2>SQL Statement:</h2>
         <!-- Input box for query  -->
         <textarea id="query-input" class="query-box" spellcheck="false" placeholder="Enter your SQL query here..."></textarea>
         <div class="query-submit-button">
-            <button onclick="submitQuery()">Submit</button>
+            <button onclick="submitQuery()">Run SQL &#187;</button>
         </div>
         <!-- Right Column: Display log info -->
-        <div>
-            <h3>Results</h3>
-            <!-- text box to display logs -->
+        <!-- <div>
+            <h3>Result:</h3>
             <textarea id="results-box" class="results-box" placeholder="Configure Server IP" readonly></textarea>
-        </div>
+        </div> -->
     </div>
     
     <!-- Right Column: Table Names List -->
     <div class="second-column">
-        <h3>Table Names</h3>
-        <div class="table-name-list">
-            <a href="#">TableName0</a>
-            <a href="#">TableName1</a>
-            <a href="#">TableName2</a>
-            <a href="#">TableName3</a>
-            <a href="#">TableName4</a>
-            <a href="#">TableName5</a>
-            <a href="#">TableName6</a>
-            <a href="#">TableName7</a>
-            <a href="#">TableName8</a>
-            <a href="#">TableName9</a>
-            <a href="#">TableName10</a>
+        <h3>Database Contents</h3>
+        <div class="side-container">
+            <div class="table-name-list" id="tableList">
+                <span>Tables:</span>
+            </div>
+            <div class="records-list" id="recordsList">
+                <span>Records:</span>
+            </div>
+        </div>
+        <button onclick="testLoadTables()">Restore Data</button>
         </div>
     </div>
 </div>
@@ -279,7 +329,7 @@
 <!-- Third Section (Single column) -->
 <div class="single-column-section">
     <div class="single-column">
-        <h2>Employee Data</h2>
+        <h2 id="selectedTableName">Employee Data</h2>
         
         <!-- Table with Employee Data -->
         <table class="generic-table">
@@ -371,93 +421,107 @@
 
 
 <script>
-
+    // Use CodeMirror editor for SQL syntax highlighting
     const SQL_editor = CodeMirror.fromTextArea(document.getElementById("query-input"), {
     mode: "text/x-sql",
     htmlMode: false,
     lineWrapping: true,
     smartIndent: false,
     addModeClass: true,
-    lineNumbers: true,
-    })
+    lineNumbers: true
+    });
 
-    // Function to limit the input to a specific number of characters
-    function limitInput(input, length) {
-        if (input.value.length > length) {
-            input.value = input.value.slice(0, length);
-        }
-    }
-
-    // Function to save the server IP to localStorage
-    function saveServerIP() {
-        // Get the values from the input boxes
-        const input1 = document.getElementById("input1").value;
-        const input2 = document.getElementById("input2").value;
-        const input3 = document.getElementById("input3").value;
-        const input4 = document.getElementById("input4").value;
-
-        // Concatenate the values into a single string with periods in between
-        const serverIP = `${input1}.${input2}.${input3}.${input4}`;
-
-        // Save the concatenated string to localStorage with the key 'api_server_ip'
-        localStorage.setItem('api_server_ip', serverIP);
-
-        // Optionally, log it to the console for confirmation
-        console.log('Server IP saved:', serverIP);
-
-        //Call the API
-        const URI = `/api/connect`;
-        // const URI = `${serverIP}:3000/api/connect`;
-        fetch(URI,{
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Incorrect Server IP or Server not responding');
-            }
-            return response.json();
-        }).then(data => {
-            console.log('API Response:', data)
-        }).catch(error => {
-            alert(error);
-            console.error('Error'. error);
-        })
-
-        // const userAction = async () => {
-        //     const response = await fetch(`${serverIP}:3000/api/connect`);
-        //     const myJson = await response.json(); //extract JSON from the http response
-        //     // do something with myJson
-        //     console.log(myJson)
-        // }
-    }
-
-    // On page load, check if 'api_server_ip' exists in localStorage
+    // On page load fill in the Editor with default text
     window.onload = function() {
         SQL_editor.getDoc().setValue('SELECT * FROM ')
-        const savedIP = localStorage.getItem('api_server_ip');
+
+        // const savedIP = localStorage.getItem('api_server_ip');
 
         // If a saved IP is found, split it into the parts and populate the inputs
-        if (savedIP) {
-            const parts = savedIP.split('.');
-            document.getElementById('input1').value = parts[0] || '000';
-            document.getElementById('input2').value = parts[1] || '000';
-            document.getElementById('input3').value = parts[2] || '000';
-            document.getElementById('input4').value = parts[3] || '000';
-        } else {
-            // If no saved IP found, default to '000.00.00.000'
-            document.getElementById('input1').value = '000';
-            document.getElementById('input2').value = '000';
-            document.getElementById('input3').value = '000';
-            document.getElementById('input4').value = '000';
-        }
+        // if (savedIP) {
+        //     const parts = savedIP.split('.');
+        //     document.getElementById('input1').value = parts[0] || '000';
+        //     document.getElementById('input2').value = parts[1] || '000';
+        //     document.getElementById('input3').value = parts[2] || '000';
+        //     document.getElementById('input4').value = parts[3] || '000';
+        // } else {
+        //     // If no saved IP found, default to '000.00.00.000'
+        //     document.getElementById('input1').value = '000';
+        //     document.getElementById('input2').value = '000';
+        //     document.getElementById('input3').value = '000';
+        //     document.getElementById('input4').value = '000';
+        // }
 
         // Clear the log box
         // const logBox = document.getElementById('results-box');
         // logBox.value = '';
 
+    };
+
+    //Function to show table when table name clicked
+    function showTable(name){
+        const headerElement = document.getElementById('selectedTableName');
+        headerElement.innerText = name;
+        SQL_editor.getDoc().setValue(`SELECT * FROM ${name}`);
     }
+
+    // Function to test editing the DOM
+    function testLoadTables() {
+
+        const tableListElement = document.getElementById("tableList");
+        tableListElement.innerHTML = "<span>Tables:</span>";
+
+        const recordsListElement = document.getElementById("recordsList");
+        recordsListElement.innerHTML = "<span>Records:</span>";
+
+        //test data
+        let tableList = [
+            {name:'Customers', records: '91', URL: "#"},
+            {name:'Categories', records: '8', URL: "#"},
+            {name:'Employees', records: '10', URL: "#"},
+            {name:'OrderDetails', records: '518', URL: "#"},
+            {name:'Orders', records: '196', URL: "#"},
+            {name:'Products', records: '77', URL: "#"},
+            {name:'Shippers', records: '3', URL: "#"},
+            {name:'Suppliers', records: '29', URL: "#"},
+            {name:'Monsters', records: '3', URL: "#"}
+        ]
+
+        tableList.forEach(table => {
+            let linkElement = document.createElement("a");
+            linkElement.textContent = `${table.name}`;
+            linkElement.href = table.URL;
+            linkElement.onclick = function(event) {
+                event.preventDefault();
+                showTable(table.name);
+            };
+            tableListElement.appendChild(linkElement);
+
+            let pElement = document.createElement("p");
+            pElement.textContent = `${table.records}`;
+            recordsListElement.appendChild(pElement);
+        });
+
+
+
+        // Get the values from the input boxes
+        // const input1 = document.getElementById("input1").value;
+        // const input2 = document.getElementById("input2").value;
+        // const input3 = document.getElementById("input3").value;
+        // const input4 = document.getElementById("input4").value;
+
+        // // Concatenate the values into a single string with periods in between
+        // const serverIP = `${input1}.${input2}.${input3}.${input4}`;
+
+        // // Save the concatenated string to localStorage with the key 'api_server_ip'
+        // localStorage.setItem('api_server_ip', serverIP);
+
+        // // Optionally, log it to the console for confirmation
+        // console.log('Server IP saved:', serverIP);
+
+    }
+
+    
 
     // Override console.log to update the log box
     // (function() {
@@ -478,9 +542,26 @@
     // Function to submit query and log it
     function submitQuery() {
         SQL_editor.save()
-        const query = document.getElementById('query-input').value;
-        console.log("Query submitted: " + query);
+        const Query = document.getElementById('query-input').value;
+        console.log("Query submitted: " + Query);
         // handle the submission logic here
+
+        // Call the API
+        const Endpoint = '/api/sql';
+        fetch(Endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({query: Query})
+        })
+            .then(response => response.json()) // Parse the JSON response if needed
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
 </script>

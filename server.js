@@ -27,8 +27,9 @@ let data = {
 
 
 // GET route - Fetch data
-app.get('/api/connect', (req, res) => {
-  res.json(data);
+app.post('/api/sql', (req, res) => {
+  console.log(req.body)
+  res.json(req.body);
 });
 
 // POST route - Create new data (replace message)
