@@ -1,3 +1,6 @@
+# Ignore the db file, it will be created from the .sql file
+w3schools.db
+
 # Logs
 logs
 *.log

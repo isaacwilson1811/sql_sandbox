@@ -180,7 +180,7 @@
         /* Non-editable log box */
         .results-box {
             width: 100%;
-            height: 150px;
+            height: 50px;
             resize: none;
             box-sizing: border-box;
             padding: 10px;
@@ -303,10 +303,10 @@
             <button onclick="submitQuery()">Run SQL &#187;</button>
         </div>
         <!-- Right Column: Display log info -->
-        <!-- <div>
+        <div>
             <h3>Result:</h3>
-            <textarea id="results-box" class="results-box" placeholder="Configure Server IP" readonly></textarea>
-        </div> -->
+            <textarea id="results-box" class="results-box" placeholder="Click 'Run SQL' to execute the SQL statement above." readonly></textarea>
+        </div>
     </div>
     
     <!-- Right Column: Table Names List -->
@@ -332,7 +332,7 @@
         <h2 id="selectedTableName">Employee Data</h2>
         
         <!-- Table with Employee Data -->
-        <table class="generic-table">
+        <table class="generic-table" id="resultTable">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -434,28 +434,6 @@
     // On page load fill in the Editor with default text
     window.onload = function() {
         SQL_editor.getDoc().setValue('SELECT * FROM ')
-
-        // const savedIP = localStorage.getItem('api_server_ip');
-
-        // If a saved IP is found, split it into the parts and populate the inputs
-        // if (savedIP) {
-        //     const parts = savedIP.split('.');
-        //     document.getElementById('input1').value = parts[0] || '000';
-        //     document.getElementById('input2').value = parts[1] || '000';
-        //     document.getElementById('input3').value = parts[2] || '000';
-        //     document.getElementById('input4').value = parts[3] || '000';
-        // } else {
-        //     // If no saved IP found, default to '000.00.00.000'
-        //     document.getElementById('input1').value = '000';
-        //     document.getElementById('input2').value = '000';
-        //     document.getElementById('input3').value = '000';
-        //     document.getElementById('input4').value = '000';
-        // }
-
-        // Clear the log box
-        // const logBox = document.getElementById('results-box');
-        // logBox.value = '';
-
     };
 
     //Function to show table when table name clicked
@@ -503,7 +481,7 @@
         });
 
 
-
+        restoreData()
         // Get the values from the input boxes
         // const input1 = document.getElementById("input1").value;
         // const input2 = document.getElementById("input2").value;
@@ -543,11 +521,12 @@
     function submitQuery() {
         SQL_editor.save()
         const Query = document.getElementById('query-input').value;
-        console.log("Query submitted: " + Query);
+        document.getElementById('results-box').innerText = ''
+        console.log("Query submitted: " + JSON.stringify({query: Query}));
         // handle the submission logic here
 
         // Call the API
-        const Endpoint = '/api/sql';
+        const Endpoint = '/execute-query';
         fetch(Endpoint, {
             method: 'POST',
             headers: {
@@ -555,7 +534,69 @@
             },
             body: JSON.stringify({query: Query})
         })
-            .then(response => response.json()) // Parse the JSON response if needed
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if ('message' in data){
+                    populateTable(data.message);
+                    document.getElementById('results-box').innerText = `Records Found ${data.message.length}`;
+                } else {
+                    console.log(data.details)
+                    document.getElementById('results-box').innerText = data.details;
+                }
+                
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+    // Function to populate the table with data
+    function populateTable(rows) {
+        const tableHead = document.querySelector('#resultTable thead');
+        const tableBody = document.querySelector('#resultTable tbody');
+
+        // Clear any previous data
+        tableHead.innerHTML = '';
+        tableBody.innerHTML = '';
+
+        if (rows.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="100%">No data found</td></tr>';
+            return;
+        }
+
+        // Get headers from the first row's keys
+        const headers = Object.keys(rows[0]);
+        const headerRow = document.createElement('tr');
+        headers.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        tableHead.appendChild(headerRow);
+
+        // Add data rows
+        rows.forEach(row => {
+            const tr = document.createElement('tr');
+            headers.forEach(header => {
+                const td = document.createElement('td');
+                td.textContent = row[header];
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function restoreData() {
+        document.getElementById('results-box').innerText = ''
+        const Endpoint = '/restore-db';
+        fetch(Endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
             })
