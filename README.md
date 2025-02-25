@@ -3,4 +3,7 @@
 Uses Node Modules:
 express, sqlite3
 
-test
+git clone
+cd sql_sandbox
+npm install
+npm start
