@@ -74,12 +74,12 @@ function restoreDatabase(callback) {
                     console.log('Database restored successfully.');
                     // callback(null);
                 });
-                //db close
-                db.close((err) => {
-                    if (err) {
-                        console.error(err)
-                    }
-                })
+                // //db close
+                // db.close((err) => {
+                //     if (err) {
+                //         console.error(err)
+                //     }
+                // })
 
             });
         });

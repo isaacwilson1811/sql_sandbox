@@ -8,6 +8,8 @@ app.use('/', express.static('front_end'))
 //Import db functions
 const db = require('./rdbms')
 
+const defaultDB = require('./restore')
+
 
 //---- API Endpoints ----
 
@@ -23,7 +25,7 @@ app.get('/tables', (req, res) => {
 
 // Endpoint to restore the database
 app.post('/restore-db', (req, res) => {
-    defaultDB.restoreDatabase(sqlFilePath, (err, message) => {
+    defaultDB.restoreDatabase((err, message) => {
         if (err) { return res.status(500).json({ error: 'Failed to restore database', details: err.message }) }
         res.json({ message })
     })

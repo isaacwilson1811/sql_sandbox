@@ -320,7 +320,7 @@
                 <span>Records:</span>
             </div>
         </div>
-        <button onclick="refreshTableData()">Refresh Data</button>
+        <button onclick="restoreData()">Restore Data</button>
         </div>
     </div>
 </div>
@@ -484,9 +484,11 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                refreshTableData()
             })
             .catch((error) => {
                 console.error('Error:', error);
+                refreshTableData()
             });
     }
 
