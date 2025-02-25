@@ -329,91 +329,12 @@
 <!-- Third Section (Single column) -->
 <div class="single-column-section">
     <div class="single-column">
-        <h2 id="selectedTableName"></h2>
-        
-        <!-- Table with Employee Data -->
         <table class="generic-table" id="resultTable">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Position</th>
-                    <th>Department</th>
-                    <th>Salary</th>
-                </tr>
+
             </thead>
             <tbody>
-                <!-- Employee records -->
-                <tr>
-                    <td>1</td>
-                    <td>John Doe</td>
-                    <td>Software Engineer</td>
-                    <td>Engineering</td>
-                    <td>$80,000</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Jane Smith</td>
-                    <td>Product Manager</td>
-                    <td>Product</td>
-                    <td>$95,000</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td>Robert Brown</td>
-                    <td>Designer</td>
-                    <td>Design</td>
-                    <td>$75,000</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td>Emily Johnson</td>
-                    <td>Data Scientist</td>
-                    <td>Data</td>
-                    <td>$90,000</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td>Michael Davis</td>
-                    <td>Product Designer</td>
-                    <td>Design</td>
-                    <td>$85,000</td>
-                </tr>
-                <tr>
-                    <td>6</td>
-                    <td>Alice Wilson</td>
-                    <td>HR Manager</td>
-                    <td>HR</td>
-                    <td>$70,000</td>
-                </tr>
-                <tr>
-                    <td>7</td>
-                    <td>Chris Miller</td>
-                    <td>Marketing Specialist</td>
-                    <td>Marketing</td>
-                    <td>$60,000</td>
-                </tr>
-                <tr>
-                    <td>8</td>
-                    <td>Linda Moore</td>
-                    <td>Accountant</td>
-                    <td>Finance</td>
-                    <td>$65,000</td>
-                </tr>
-                <tr>
-                    <td>9</td>
-                    <td>James Taylor</td>
-                    <td>Sales Manager</td>
-                    <td>Sales</td>
-                    <td>$100,000</td>
-                </tr>
-                <tr>
-                    <td>10</td>
-                    <td>Patricia Garcia</td>
-                    <td>Operations Manager</td>
-                    <td>Operations</td>
-                    <td>$95,000</td>
-                </tr>
+
             </tbody>
         </table>
     </div>
@@ -437,15 +358,26 @@
         refreshTableData();
     };
 
-    //Function to show table when table name clicked
+    //Function to show table data when table name clicked
     function showTable(name){
-        const headerElement = document.getElementById('selectedTableName');
-        headerElement.innerText = name;
         SQL_editor.getDoc().setValue(`SELECT * FROM ${name}`);
+        submitQuery();
+        refreshTableData();
     }
 
     // Function to test editing the DOM
     function populateTableList(tableList) {
+
+        tableList.sort((a, b) => {
+        // Compare the 'name' properties
+        if (a.name < b.name) {
+            return -1;  // 'a' comes before 'b'
+        }
+        if (a.name > b.name) {
+            return 1;  // 'b' comes before 'a'
+        }
+        return 0;  // They are equal
+        });
 
         const tableListElement = document.getElementById("tableList");
         tableListElement.innerHTML = "<span>Tables:</span>";
@@ -469,24 +401,6 @@
         });
     }
 
-    
-
-    // Override console.log to update the log box
-    // (function() {
-    //     const originalConsoleLog = console.log;
-    //     console.log = function(...args) {
-    //         // Call the original console.log
-    //         originalConsoleLog.apply(console, args);
-
-    //         // Join the arguments into a string and display in the log box
-    //         const logMessage = args.join(' ');
-    //         const logBox = document.getElementById('results-box');
-    //         logBox.value = logMessage;
-    //         // logBox.value += logMessage + "\n";  // Append to existing content
-    //         // logBox.scrollTop = logBox.scrollHeight;  // Scroll to bottom
-    //     };
-    // })();
-
     // Function to submit query and log it
     function submitQuery() {
         SQL_editor.save()
@@ -506,6 +420,7 @@
         })
             .then(response => response.json())
             .then(data => {
+                refreshTableData();
                 console.log(data);
                 if ('message' in data){
                     populateTable(data.message);

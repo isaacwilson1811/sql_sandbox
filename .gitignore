@@ -1,6 +1,9 @@
 # Ignore the db file, it will be created from the .sql file
 w3schools.db
 
+# ignore my ideas
+ideas/
+
 # Logs
 logs
 *.log
