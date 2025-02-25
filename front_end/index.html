@@ -362,7 +362,6 @@
     function showTable(name){
         SQL_editor.getDoc().setValue(`SELECT * FROM ${name}`);
         submitQuery();
-        refreshTableData();
     }
 
     // Function to test editing the DOM
@@ -420,7 +419,7 @@
         })
             .then(response => response.json())
             .then(data => {
-                refreshTableData();
+                delayRefresh();
                 console.log(data);
                 if ('message' in data){
                     populateTable(data.message);
@@ -484,11 +483,10 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
-                refreshTableData()
+                delayRefresh()
             })
             .catch((error) => {
                 console.error('Error:', error);
-                refreshTableData()
             });
     }
 
@@ -510,6 +508,14 @@
         .catch((error) => {
             console.error('Error:', error);
         });
+    }
+
+    function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+    async function delayRefresh() {
+    await wait(500);
+    refreshTableData()
     }
 
 </script>
