@@ -10,7 +10,7 @@ function dropAllTables(callback) {
             console.error('Error opening database:', err.message);
             return callback(err);
         }
-        console.log('Opening default db...');
+        console.log('Opening sqlite3 connection...');
 
         // Get all table names in the database
         db.all("SELECT name FROM sqlite_master WHERE type='table'", (err, tables) => {
@@ -25,7 +25,6 @@ function dropAllTables(callback) {
             }
 
             // Drop each table
-            console.log('Dropping existing tables...')
             let dropQueries = tables.map(table => `DROP TABLE IF EXISTS ${table.name}`).join('; ');
 
             // Execute the drop queries
@@ -34,7 +33,6 @@ function dropAllTables(callback) {
                     console.error('Error dropping tables:', err.message);
                     return callback(err);
                 }
-                console.log('All tables dropped.');
                 callback(null);  // Successfully dropped all tables
             });
         });
@@ -56,7 +54,7 @@ function restoreDatabase(callback) {
                 console.error('Error creating database:', err.message);
                 return callback(err);
             }
-            console.log('New database created.');
+            console.log('Database created.');
 
             // Read the SQL backup file to restore
             fs.readFile(sqlFilePath, 'utf8', (err, sql) => {
@@ -71,7 +69,7 @@ function restoreDatabase(callback) {
                         console.error('Error restoring database:', err.message);
                         return callback(err);
                     }
-                    console.log('Database restored successfully.');
+                    console.log('Database restored from backup SQL successfully.');
                     // callback(null);
                 });
                 //db close
@@ -86,7 +84,10 @@ function restoreDatabase(callback) {
     });
 }
 
-
-module.exports = {
-    restoreDatabase
-};
+restoreDatabase((err, message) => {
+    if (err) {
+        console.error('Error restoring the database:', err.message)
+    } else {
+        console.log(message)
+    }
+})

@@ -10,19 +10,34 @@ const db = new sqlite3.Database('w3schools.db', (err) => {
     }
 });
 
-
-//Function to just exec whatever
-function doIt(sql){
-    db.exec(sql, (err) => {
+function getTables(callback) {
+    let tableList = [];
+    db.all("SELECT * FROM sqlite_master WHERE type='table'", (err, tables) => {
         if (err) {
             return callback(err);
         }
-
-        console.log('did it');
-        
-        callback(null, 'i did it');
+        let promises = tables.map((table) => {
+            return new Promise((resolve, reject) => {
+                db.all(`SELECT COUNT(*) AS records FROM ${table.name}`, (err, obj) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        tableList.push({ 'name': table.name, 'records': obj[0].records });
+                        resolve();
+                    }
+                });
+            });
+        });
+        Promise.all(promises)
+            .then(() => {
+                callback(null, tableList);
+            })
+            .catch((err) => {
+                callback(err);
+            });
     });
-}
+};
+
 
 // Function to execute a custom SQL query
 function execQuery(query, callback) {
@@ -96,6 +111,6 @@ module.exports = {
     insertUser,
     getUsers,
     closeDatabase,
-    doIt,
-    execQuery
+    execQuery,
+    getTables
 };

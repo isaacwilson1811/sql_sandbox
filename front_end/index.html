@@ -320,7 +320,7 @@
                 <span>Records:</span>
             </div>
         </div>
-        <button onclick="testLoadTables()">Restore Data</button>
+        <button onclick="refreshTableData()">Refresh Data</button>
         </div>
     </div>
 </div>
@@ -329,7 +329,7 @@
 <!-- Third Section (Single column) -->
 <div class="single-column-section">
     <div class="single-column">
-        <h2 id="selectedTableName">Employee Data</h2>
+        <h2 id="selectedTableName"></h2>
         
         <!-- Table with Employee Data -->
         <table class="generic-table" id="resultTable">
@@ -433,7 +433,8 @@
 
     // On page load fill in the Editor with default text
     window.onload = function() {
-        SQL_editor.getDoc().setValue('SELECT * FROM ')
+        SQL_editor.getDoc().setValue('SELECT * FROM ');
+        refreshTableData();
     };
 
     //Function to show table when table name clicked
@@ -444,26 +445,13 @@
     }
 
     // Function to test editing the DOM
-    function testLoadTables() {
+    function populateTableList(tableList) {
 
         const tableListElement = document.getElementById("tableList");
         tableListElement.innerHTML = "<span>Tables:</span>";
 
         const recordsListElement = document.getElementById("recordsList");
         recordsListElement.innerHTML = "<span>Records:</span>";
-
-        //test data
-        let tableList = [
-            {name:'Customers', records: '91', URL: "#"},
-            {name:'Categories', records: '8', URL: "#"},
-            {name:'Employees', records: '10', URL: "#"},
-            {name:'OrderDetails', records: '518', URL: "#"},
-            {name:'Orders', records: '196', URL: "#"},
-            {name:'Products', records: '77', URL: "#"},
-            {name:'Shippers', records: '3', URL: "#"},
-            {name:'Suppliers', records: '29', URL: "#"},
-            {name:'Monsters', records: '3', URL: "#"}
-        ]
 
         tableList.forEach(table => {
             let linkElement = document.createElement("a");
@@ -479,24 +467,6 @@
             pElement.textContent = `${table.records}`;
             recordsListElement.appendChild(pElement);
         });
-
-
-        restoreData()
-        // Get the values from the input boxes
-        // const input1 = document.getElementById("input1").value;
-        // const input2 = document.getElementById("input2").value;
-        // const input3 = document.getElementById("input3").value;
-        // const input4 = document.getElementById("input4").value;
-
-        // // Concatenate the values into a single string with periods in between
-        // const serverIP = `${input1}.${input2}.${input3}.${input4}`;
-
-        // // Save the concatenated string to localStorage with the key 'api_server_ip'
-        // localStorage.setItem('api_server_ip', serverIP);
-
-        // // Optionally, log it to the console for confirmation
-        // console.log('Server IP saved:', serverIP);
-
     }
 
     
@@ -603,6 +573,26 @@
             .catch((error) => {
                 console.error('Error:', error);
             });
+    }
+
+    function refreshTableData() {
+        const Endpoint = '/tables';
+        fetch(Endpoint, {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            if ('message' in data){
+                populateTableList(data.message);
+            } else {
+                console.log(data.details)
+                document.getElementById('results-box').innerText = data.details;
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }
 
 </script>
